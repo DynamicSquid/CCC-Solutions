@@ -5,7 +5,7 @@ using namespace std;
 struct Step
 {
     int x, y, s;
-}
+};
 
 int main()
 {
