@@ -1,90 +1,69 @@
-/**
- *    author:  sjay05
-**/
-#include <bits/stdc++.h>
-
+#include <stdio.h>
+#include <vector>
 using namespace std;
 
-typedef long long ll;
-typedef vector<int> vi;
+bool pho[100000] = { false };
+vector<int> list[100000];
 
-const int maxn = 100000 + 5;
-int n, m, xx, a, b, max_d, max_n, ans = 0, ret = 0;
-bool pho[maxn];
-vector<vi> adj(maxn);
+bool prune(int num, int prev)
+{
+    for (int v : list[num])
+    {
+        if (v != prev && prune(v, num))
+            pho[num] = true;
+    }
 
-void dfs(int u, int p) {
-    for (int v : adj[u]) {
-        if (v != p) {
-            dfs(v, u);
-            if (pho[v]) {
-                pho[u] = true;
-            }
-        }
+    return pho[num];
+}
+
+int max_dist = 0, end_dist = 0;
+void dist(int num, int prev, int d)
+{
+    if (d > max_dist)
+    {
+        max_dist = d;
+        end_dist = num;
+    }
+
+    for (int v : list[num])
+    {
+        if (v != prev && pho[v])
+            dist(v, num, d + 1);
     }
 }
 
-void dfs_diam(int n, int p, int dis) {
-    if (dis > max_d) {
-        max_d = dis;
-        max_n = n;
+int main()
+{
+    int N, M;
+    scanf("%i %i", &N, &M);
+
+    int num;
+    for (int a = 0; a < M; ++a)
+    {
+        scanf("%d", &num);
+        pho[num] = true;
     }
-    for (int v : adj[n]) {
-        if (v != p && pho[v]) {
-            dfs_diam(v, n, dis + 1);
-        }
+
+    for (int a = 0; a < N - 1; ++a)
+    {
+        int x, y;
+        scanf("%i %i", &x, &y);
+
+        list[x].push_back(y);
+        list[y].push_back(x);
     }
+
+    prune(num, -1);
+
+    dist(num, -1, 0);
+    dist(end_dist, -1, 0);
+
+    int nodes = 0;
+    for (int a = 0; a < N; ++a)
+    {
+        if (pho[a])
+            nodes++;
+    }
+
+    printf("%d", 2 * (nodes - 1) - max_dist);
 }
-
-int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(0);
-    cin >> n >> m;
-    for (int i = 0; i < m; i++) {
-        cin >> xx;
-        pho[xx] = true;
-    }
-    for (int i = 0; i < n - 1; i++) {
-        cin >> a >> b;
-        adj[a].push_back(b);
-        adj[b].push_back(a);
-    }
-    dfs(xx, -1);
-    for (int i = 0; i < n; i++) {
-        if (pho[i]) {
-            ans++;
-        }
-    }
-    dfs_diam(xx, -1, 0);
-    dfs_diam(max_n, -1, 0);
-    ret += 2 * (ans - 1);
-    cout << ret - max_d << "\n";
-}
-
-/*
-Process:
-- In order to go through all the pho
-restaurants we must go into a subtree
-if a pho-restaurant is in it. So
-first we mark all the nodes we MUST MUST
-visit even if it is not a restaurant.
-
-
-For Ex:
-1 -> 2 -> 3
-          |
-          4
-If (4) is a pho, we must visit 3 as there
-is no other way of going to 4. So once
-mandated nodes are marked, find the number
-of such nodes and for now image you went over
-all edges twice. If (ans) is the number of
-MUST nodes, total edge length will be 2 * (ans - 1),
-also since there are N - 1 edges for N nodes
-in this problem.
-
-BUT, since it is not mandatory to come back where
-we started, we can find the LONGEST distance
-we can avoid and this happens to be the diameter
-of the tree (longest distance between two nodes).
-*/

@@ -1,28 +1,29 @@
-/*
- * Author: DynamicSquid
- */
-
-#include <iostream>
+#include <stdio.h>
 #include <vector>
 using namespace std;
 
-int T, wins = 0;
+int T, score = 0;
 
-void score(vector<vector<int> > games, vector<int> points) {
-    if (games.empty()) {
+void play(vector<vector<int> > games, int (&points)[4])
+{
+    if (games.empty())
+    {
         int max = 0;
-        for (size_t a = 1; a < points.size(); ++a) {
+
+        for (int a = 1; a < 4; ++a)
+        {
             if (points[a] > points[max])
                 max = a;
         }
 
-        for (size_t a = 0; a < points.size(); ++a) {
+        for (int a = 0; a < 4; ++a)
+        {
             if (a != max && points[a] == points[max])
                 return;
         }
 
         if (max == T - 1)
-            wins++;
+            score++;
 
         return;
     }
@@ -32,23 +33,24 @@ void score(vector<vector<int> > games, vector<int> points) {
     games.pop_back();
 
     points[t1] += 3;
-    score(games, points);
+    play(games, points);
     points[t1] -= 3;
 
     points[t2] += 3;
-    score(games, points);
+    play(games, points);
     points[t2] -= 3;
 
     points[t1]++;
     points[t2]++;
-    score(games, points);
+    play(games, points);
     points[t1]--;
     points[t2]--;
 }
 
-int main() {
+int main()
+{
     int G;
-    cin >> T >> G;
+    scanf("%i %i", &T, &G);
 
     vector<vector<int> > games{
         { 1, 2 }, { 1, 3 }, { 1, 4 },
@@ -56,32 +58,37 @@ int main() {
         { 3, 4 }
     };
 
-    vector<int> points{ 0, 0, 0, 0 };
+    int points[4] = { 0 };
 
-    for (int a = 0; a < G; ++a) {
+    for (int a = 0; a < G; ++a)
+    {
         int t1, t2, s1, s2;
-        cin >> t1 >> t2 >> s1 >> s2;
+        scanf("%i %i %i %i", &t1, &t2, &s1, &s2);
 
-        for (size_t b = 0; b < games.size(); ++b) {
-            if ((games[b][0] == t1 && games[b][1] == t2) || (games[b][0] == t2 && games[b][1] == t1)) {
+        for (int b = 0; b < (int)games.size(); ++b)
+        {
+            if ((games[b][0] == t1 && games[b][1] == t2) || (games[b][0] == t2 && games[b][1] == t1))
+            {
                 games.erase(games.begin() + b);
                 break;
             }
         }
 
-        if (s1 > s2) {
+        if (s1 > s2)
+        {
             points[t1 - 1] += 3;
         }
-        else if (s1 < s2) {
+        else if (s1 < s2)
+        {
             points[t2 - 1] += 3;
         }
-        else {
+        else
+        {
             points[t1 - 1]++;
             points[t2 - 1]++;
         }
     }
 
-    score(games, points);
-
-    cout << wins;
+    play(games, points);
+    printf("%i", score);
 }
