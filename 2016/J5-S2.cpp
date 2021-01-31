@@ -17,7 +17,7 @@ int main()
 	scanf("%i %i", &Q, &N);
 
 	int dmoj[100], peg[100];
-
+	
 	for (int a = 0; a < N; ++a)
 		scanf("%i", &dmoj[a]);
 	for (int a = 0; a < N; ++a)
