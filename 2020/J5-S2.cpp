@@ -1,32 +1,32 @@
 #include <stdio.h>
+#include <vector>
+using namespace std;
 
 int M, N;
-bool been[1000][1000];
+bool been[1000][1000] = { false };
 int grid[1000][1000];
+vector<int> cells[1000001];
 
 void walk(int x, int y)
 {
     if (x == N - 1 && y == M - 1)
         throw 0;
     
-    for (int a = 1; a * a <= grid[y][x]; ++a)
+    for (int num : cells[grid[y][x]])
     {
-        if (grid[y][x] % a == 0)
-        {
-            int num1 = a - 1;
-            int num2 = grid[y][x] / a - 1;
+		int num1 = num - 1;
+		int num2 = grid[y][x] / num - 1;
 
-            if (num1 < M && num2 < N && !been[num1][num2])
-            {
-                been[num1][num2] = true;
-                walk(num2, num1);
-            }
-            if (num2 < M && num1 < N && !been[num2][num1])
-            {
-                been[num2][num1] = true;
-                walk(num1, num2);
-            }
-        }
+		if (num1 < M && num2 < N && !been[num1][num2])
+		{
+			been[num1][num2] = true;
+			walk(num2, num1);
+		}
+		if (num2 < M && num1 < N && !been[num2][num1])
+		{
+			been[num2][num1] = true;
+			walk(num1, num2);
+		}
     }
 }
 
@@ -39,11 +39,12 @@ int main()
         for (int b = 0; b < N; ++b)
         {
             scanf("%i", &grid[a][b]);
-            been[a][b] = false;
+			cells[(a + 1) * (b + 1)].push_back(a + 1);
+			cells[(a + 1) * (b + 1)].push_back(b + 1);
         }
     }
 
-    been[0][0] = true;
+	been[0][0] = true;
 
     try {
         walk(0, 0);
